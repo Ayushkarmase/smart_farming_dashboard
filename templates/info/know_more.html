@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}Know More - Agronomy Knowledge Hub{% endblock %}
+{% block page_title %}Agronomy & Precision Farming Knowledge Hub{% endblock %}
+{% block page_subtitle %}In-depth scientific guides on plant nutrition, smart farming methodologies, and environmental sustainability{% endblock %}
+
+{% block content %}
+<div style="display: flex; flex-direction: column; gap: 32px; max-width: 1100px; margin: 0 auto;">
+
+    <!-- Intro Card -->
+    <div class="card" style="background: linear-gradient(135deg, #064e3b 0%, #047857 100%); color: #fff;">
+        <span class="tag" style="background: rgba(255,255,255,0.2); color: #fff; margin-bottom: 12px;">
+            <i class="fas fa-book-open"></i> Curated Field Reference
+        </span>
+        <h2 style="font-size: 1.6rem; font-weight: 800; margin-bottom: 8px;">
+            Mastering Modern Agronomy & Soil Science
+        </h2>
+        <p style="font-size: 0.92rem; opacity: 0.9; max-width: 800px; line-height: 1.6;">
+            A healthy crop begins with balanced soil nourishment. Explore the scientific classification of fertilizers, the mechanics of precision farming, and sustainable practices that safeguard our soil microbiome for future generations.
+        </p>
+    </div>
+
+    <!-- Section 1: Types of Fertilizers & Nutrients -->
+    <div>
+        <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--text-main); margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-flask-vial" style="color: var(--primary);"></i> 1. Major Fertilizer Classes & Plant Functions
+        </h3>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
+            <!-- Nitrogenous -->
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h4 style="font-size: 1.05rem; font-weight: 700; color: #047857;">Nitrogenous Fertilizers (N)</h4>
+                    <span class="tag tag-positive">Vegetative Growth</span>
+                </div>
+                <p style="font-size: 0.86rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 10px;">
+                    Nitrogen is the fundamental building block of chlorophyll and amino acids, driving leaf canopy and tillering vigor.
+                </p>
+                <div style="font-size: 0.8rem; background: #f8fafc; padding: 10px; border-radius: var(--radius-sm);">
+                    <strong>Common Types:</strong> Urea (46% N), Ammonium Sulphate (20.6% N), Calcium Ammonium Nitrate (CAN 25% N).
+                </div>
+            </div>
+
+            <!-- Phosphatic -->
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h4 style="font-size: 1.05rem; font-weight: 700; color: #0284c7;">Phosphatic Fertilizers (P)</h4>
+                    <span class="tag" style="background: #e0f2fe; color: #0284c7;">Root & Energy</span>
+                </div>
+                <p style="font-size: 0.86rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 10px;">
+                    Phosphorus powers ATP energy transfer, accelerating deep root establishment, early flowering, and seed maturation.
+                </p>
+                <div style="font-size: 0.8rem; background: #f8fafc; padding: 10px; border-radius: var(--radius-sm);">
+                    <strong>Common Types:</strong> DAP (18:46:0), Single Super Phosphate (SSP 16% P2O5), Triple Super Phosphate (TSP).
+                </div>
+            </div>
+
+            <!-- Potassic -->
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h4 style="font-size: 1.05rem; font-weight: 700; color: #d97706;">Potassic Fertilizers (K)</h4>
+                    <span class="tag" style="background: #fef3c7; color: #d97706;">Immunity & Quality</span>
+                </div>
+                <p style="font-size: 0.86rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 10px;">
+                    Potassium regulates stomatal water loss, fortifies cell walls against pests/frost, and boosts grain/fruit weight and sweetness.
+                </p>
+                <div style="font-size: 0.8rem; background: #f8fafc; padding: 10px; border-radius: var(--radius-sm);">
+                    <strong>Common Types:</strong> Muriate of Potash (MOP 60% K2O), Sulphate of Potash (SOP 50% K2O).
+                </div>
+            </div>
+
+            <!-- Complex NPK & Bio -->
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h4 style="font-size: 1.05rem; font-weight: 700; color: #7e22ce;">Complex & Bio-Fertilizers</h4>
+                    <span class="tag" style="background: #f3e8ff; color: #7e22ce;">Synergistic Nutrition</span>
+                </div>
+                <p style="font-size: 0.86rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 10px;">
+                    Complex granules ensure homogeneous nutrient distribution, while microbial inoculants convert atmospheric nitrogen and unlock insoluble minerals.
+                </p>
+                <div style="font-size: 0.8rem; background: #f8fafc; padding: 10px; border-radius: var(--radius-sm);">
+                    <strong>Common Types:</strong> NPK 10:26:26, 12:32:16, 19:19:19, Azotobacter, Rhizobium, Mycorrhiza.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 2: Smart & Precision Agriculture -->
+    <div>
+        <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--text-main); margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-satellite-dish" style="color: var(--secondary);"></i> 2. Principles of Smart & Precision Agriculture
+        </h3>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+            <div class="card" style="border-top: 4px solid var(--secondary);">
+                <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 6px;">IoT Soil Sensors & Telemetry</h4>
+                <p style="font-size: 0.86rem; color: var(--text-muted); line-height: 1.5;">
+                    Continuous monitoring of soil moisture, electrical conductivity (EC), and temperature prevents over-irrigation and nutrient leaching.
+                </p>
+            </div>
+
+            <div class="card" style="border-top: 4px solid var(--primary);">
+                <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 6px;">Variable Rate Application (VRA)</h4>
+                <p style="font-size: 0.86rem; color: var(--text-muted); line-height: 1.5;">
+                    Using GPS-guided tractors and smart sprayers to dispense higher fertilizer quantities only where soil tests indicate deficiency.
+                </p>
+            </div>
+
+            <div class="card" style="border-top: 4px solid #f59e0b;">
+                <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 6px;">Automated Fertigation</h4>
+                <p style="font-size: 0.86rem; color: var(--text-muted); line-height: 1.5;">
+                    Injecting water-soluble fertilizers directly into drip irrigation systems delivers micro-doses directly to the root zone at 90%+ efficiency.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 3: Environmental Awareness & Sustainable Practices -->
+    <div class="card" style="background: #f0fdf4; border: 1px solid #bbf7d0;">
+        <div class="card-header">
+            <div class="card-title" style="color: #065f46;">
+                <i class="fas fa-seedling"></i> 3. Environmental Impact & Regenerative Soil Practices
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; color: #166534; font-size: 0.88rem; line-height: 1.6;">
+            <div>
+                <strong>Preventing Groundwater Eutrophication:</strong>
+                <p style="margin-top: 4px; color: #14532d;">
+                    Excessive urea and nitrate runoff infiltrates local aquifers and rivers, causing algae blooms. Adopting split-dose top-dressing drastically minimizes runoff.
+                </p>
+            </div>
+            <div>
+                <strong>Soil Organic Carbon (SOC) Enhancement:</strong>
+                <p style="margin-top: 4px; color: #14532d;">
+                    Integrating green manures (Dhaincha, Sunn Hemp) and vermicompost elevates soil organic carbon, increasing soil microbial biodiversity and water retention.
+                </p>
+            </div>
+            <div>
+                <strong>Crop Rotation & Nitrogen Fixation:</strong>
+                <p style="margin-top: 4px; color: #14532d;">
+                    Rotating cereals (rice/wheat) with leguminous pulses (soybean, gram) naturally replenishes 30-50 kg of biological nitrogen per acre without synthetic inputs.
+                </p>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

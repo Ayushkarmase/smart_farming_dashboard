@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% block title %}Recommendation Results{% endblock %}
+{% block page_title %}AI Fertilizer Prescription & Plan{% endblock %}
+{% block page_subtitle %}Optimized nutrient schedule calculated for {{ result['crop_type'] }} in {{ result['soil_type'] }} soil{% endblock %}
+
+{% block content %}
+<div style="max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px;">
+
+    <!-- Top Highlight Banner -->
+    <div class="card" style="background: linear-gradient(135deg, #064e3b 0%, #047857 100%); color: #fff; position: relative; overflow: hidden;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; z-index: 2; position: relative;">
+            <div>
+                <span class="tag" style="background: rgba(255,255,255,0.25); color: #fff; margin-bottom: 12px;">
+                    <i class="fas fa-check-circle"></i> Optimal Agro-Prescription
+                </span>
+                <h2 style="font-size: 1.75rem; font-weight: 800; margin-bottom: 6px;">
+                    {{ result['primary_fertilizer'] }}
+                </h2>
+                <p style="font-size: 0.95rem; opacity: 0.92; max-width: 700px; line-height: 1.5;">
+                    {{ result['explanation'] }}
+                </p>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 18px 24px; border-radius: var(--radius-lg); text-align: center; border: 1px solid rgba(255,255,255,0.25);">
+                <div style="font-size: 0.8rem; text-transform: uppercase; font-weight: 700; opacity: 0.85;">Recommended Dosage</div>
+                <div style="font-size: 2.2rem; font-weight: 800; line-height: 1.2;">
+                    {{ result['dosage_kg_per_acre'] }} <span style="font-size: 1.1rem; font-weight: 500;">kg/acre</span>
+                </div>
+                <div style="font-size: 0.75rem; opacity: 0.8; margin-top: 4px;">Target: {{ result['crop_type'] }}</div>
+            </div>
+        </div>
+        <i class="fas fa-seedling" style="position: absolute; right: -20px; bottom: -30px; font-size: 10rem; opacity: 0.08; pointer-events: none;"></i>
+    </div>
+
+    <!-- Grid: Soil Nutrient Status & pH Guidance -->
+    <div style="display: grid; grid-template-columns: 3fr 2fr; gap: 24px;">
+        <!-- Nutrient Level Audit -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="fas fa-chart-column"></i> Macro-Nutrient Balances (NPK)
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Nutrient</th>
+                            <th>Current (kg/ha)</th>
+                            <th>Crop Target (kg/ha)</th>
+                            <th>Deficit / Surplus</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Nitrogen (N)</strong></td>
+                            <td>{{ result['nutrients_status']['N']['current'] }}</td>
+                            <td>{{ result['nutrients_status']['N']['target'] }}</td>
+                            <td>{{ -result['nutrients_status']['N']['diff'] }}</td>
+                            <td>
+                                <span class="tag {% if result['nutrients_status']['N']['status'] == 'Optimal' %}tag-positive{% elif result['nutrients_status']['N']['status'] == 'Deficient' %}tag-negative{% else %}tag-neutral{% endif %}">
+                                    {{ result['nutrients_status']['N']['status'] }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Phosphorus (P)</strong></td>
+                            <td>{{ result['nutrients_status']['P']['current'] }}</td>
+                            <td>{{ result['nutrients_status']['P']['target'] }}</td>
+                            <td>{{ -result['nutrients_status']['P']['diff'] }}</td>
+                            <td>
+                                <span class="tag {% if result['nutrients_status']['P']['status'] == 'Optimal' %}tag-positive{% elif result['nutrients_status']['P']['status'] == 'Deficient' %}tag-negative{% else %}tag-neutral{% endif %}">
+                                    {{ result['nutrients_status']['P']['status'] }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Potassium (K)</strong></td>
+                            <td>{{ result['nutrients_status']['K']['current'] }}</td>
+                            <td>{{ result['nutrients_status']['K']['target'] }}</td>
+                            <td>{{ -result['nutrients_status']['K']['diff'] }}</td>
+                            <td>
+                                <span class="tag {% if result['nutrients_status']['K']['status'] == 'Optimal' %}tag-positive{% elif result['nutrients_status']['K']['status'] == 'Deficient' %}tag-negative{% else %}tag-neutral{% endif %}">
+                                    {{ result['nutrients_status']['K']['status'] }}
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- pH & Soil Health Card -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="fas fa-vial"></i> Soil pH & Climate Factors
+                </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 14px;">
+                <div style="padding: 14px; background: #f8fafc; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                    <div style="font-weight: 700; font-size: 0.88rem; color: var(--text-main); margin-bottom: 4px;">
+                        Soil pH Rating: <strong>{{ ph }}</strong>
+                    </div>
+                    <p style="font-size: 0.84rem; color: var(--text-muted);">
+                        {{ result['ph_assessment'] }}
+                    </p>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div style="padding: 10px; background: #f0fdf4; border-radius: var(--radius-sm); font-size: 0.82rem;">
+                        <span style="color: var(--text-muted);">Temperature:</span>
+                        <strong style="color: #065f46; display: block;">{{ temp }} °C</strong>
+                    </div>
+                    <div style="padding: 10px; background: #f0f9ff; border-radius: var(--radius-sm); font-size: 0.82rem;">
+                        <span style="color: var(--text-muted);">Humidity:</span>
+                        <strong style="color: #0369a1; display: block;">{{ humidity }} %</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Schedule Timeline -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">
+                <i class="fas fa-calendar-days"></i> Stage-by-Stage Application Schedule
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px;">
+            {% for stage in result['application_stages'] %}
+                <div style="padding: 18px; border-radius: var(--radius-md); background: #ffffff; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); border-top: 4px solid var(--primary);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span class="tag tag-positive">{{ stage['share'] }} of Total</span>
+                    </div>
+                    <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 6px; color: var(--text-main);">
+                        {{ stage['stage'] }}
+                    </h4>
+                    <p style="font-size: 0.84rem; color: var(--text-muted); line-height: 1.5;">
+                        {{ stage['details'] }}
+                    </p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Sustainable Eco Tips -->
+    <div class="card" style="background: #f0fdf4; border: 1px solid #bbf7d0;">
+        <div class="card-header">
+            <div class="card-title" style="color: #065f46;">
+                <i class="fas fa-earth-americas"></i> Sustainable Farming & Eco-Friendly Tips
+            </div>
+        </div>
+        <ul style="padding-left: 20px; font-size: 0.88rem; color: #166534; display: flex; flex-direction: column; gap: 8px;">
+            {% for tip in result['eco_tips'] %}
+                <li>{{ tip }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Action Bar -->
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <a href="{{ url_for('fertilizer.recommend') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Run Another Calculation
+        </a>
+        <div style="display: flex; gap: 12px;">
+            <a href="{{ url_for('history.fertilizer_history') }}" class="btn btn-outline">
+                <i class="fas fa-history"></i> View in History Log
+            </a>
+            <button onclick="window.print()" class="btn btn-primary">
+                <i class="fas fa-print"></i> Print Prescription
+            </button>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

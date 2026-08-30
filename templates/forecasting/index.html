@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}Sales & Demand Forecasting{% endblock %}
+{% block page_title %}AI Fertilizer Sales & Demand Forecasting{% endblock %}
+{% block page_subtitle %}Predict seasonal demand patterns and inventory requirements using machine learning regression{% endblock %}
+
+{% block content %}
+<div style="display: flex; flex-direction: column; gap: 24px;">
+
+    <!-- Selector Control Card -->
+    <div class="card">
+        <form method="POST" action="{{ url_for('forecasting.index') }}" style="display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-end;">
+            <div style="flex: 2; min-width: 260px;">
+                <label class="form-label" for="product_type">
+                    <i class="fas fa-boxes-stacked" style="color: var(--primary);"></i> Fertilizer Product
+                </label>
+                <select id="product_type" name="product_type" class="form-control">
+                    {% for p in products %}
+                        <option value="{{ p }}" {% if p == selected_product %}selected{% endif %}>{{ p }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div style="flex: 1; min-width: 180px;">
+                <label class="form-label" for="horizon_months">
+                    <i class="fas fa-calendar" style="color: var(--secondary);"></i> Forecast Horizon
+                </label>
+                <select id="horizon_months" name="horizon_months" class="form-control">
+                    <option value="3" {% if selected_horizon == 3 %}selected{% endif %}>Next 3 Months</option>
+                    <option value="6" {% if selected_horizon == 6 %}selected{% endif %}>Next 6 Months (Standard)</option>
+                    <option value="12" {% if selected_horizon == 12 %}selected{% endif %}>Next 12 Months (Annual)</option>
+                </select>
+            </div>
+
+            <div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-chart-line"></i> Generate Forecast
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Forecasting Summary KPIs -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon stat-icon-emerald">
+                <i class="fas fa-cubes"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ forecast['total_projected_demand'] }} <small style="font-size: 0.9rem; font-weight: 500;">MT</small></h3>
+                <p>Total Projected Demand</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon stat-icon-blue">
+                <i class="fas fa-arrow-trend-up"></i>
+            </div>
+            <div class="stat-content">
+                <h3 style="color: {% if forecast['avg_growth_rate'] >= 0 %}#059669{% else %}#dc2626{% endif %};">
+                    {{ forecast['avg_growth_rate'] }}%
+                </h3>
+                <p>Expected Period Growth</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon stat-icon-amber">
+                <i class="fas fa-bullseye"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ (forecast['metrics']['r2_score'] * 100)|round(1) }}%</h3>
+                <p>Model Confidence (R²)</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon stat-icon-purple">
+                <i class="fas fa-calculator"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ forecast['metrics']['rmse'] }}</h3>
+                <p>Model Error (RMSE Index)</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interactive Trend Chart -->
+    <div class="card">
+        <div class="card-header">
+            <div>
+                <div class="card-title">
+                    <i class="fas fa-chart-area"></i> Demand Projection Curve: {{ selected_product }}
+                </div>
+                <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 4px;">
+                    Historical actual sales (last 6 months) vs. AI machine learning projection with 95% confidence intervals
+                </div>
+            </div>
+
+            <a href="{{ url_for('forecasting.export_csv', product=selected_product, horizon=selected_horizon) }}" class="btn btn-secondary btn-sm">
+                <i class="fas fa-file-csv"></i> Download CSV Report
+            </a>
+        </div>
+
+        <div style="height: 380px; position: relative;">
+            <canvas id="forecastCanvas"></canvas>
+        </div>
+    </div>
+
+    <!-- Monthly Breakdown Table -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">
+                <i class="fas fa-table"></i> Month-Wise Demand & Turnover Estimates
+            </div>
+            <span class="tag tag-positive">
+                Linear Regression + Seasonal Weighting
+            </span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Target Period</th>
+                        <th>Projected Demand</th>
+                        <th>Lower Bound (MT)</th>
+                        <th>Upper Bound (MT)</th>
+                        <th>Estimated Regional Turnover</th>
+                        <th>Stock Allocation Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in forecast['breakdown_table'] %}
+                        <tr>
+                            <td><strong>{{ row['month'] }}</strong></td>
+                            <td><span style="font-weight: 700; color: var(--primary-dark);">{{ row['forecast_tonnes'] }} MT</span></td>
+                            <td>{{ row['range_min'] }} MT</td>
+                            <td>{{ row['range_max'] }} MT</td>
+                            <td>{{ row['expected_turnover'] }}</td>
+                            <td>
+                                <span class="tag tag-positive">
+                                    <i class="fas fa-circle-check"></i> Stock Prepared
+                                </span>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const forecastData = {{ forecast | tojson }};
+        initForecastChart('forecastCanvas', forecastData);
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}AI Fertilizer Recommendation{% endblock %}
+{% block page_title %}AI Fertilizer Recommendation Engine{% endblock %}
+{% block page_subtitle %}Provide soil nutrient parameters and environmental factors for custom agronomic prescriptions{% endblock %}
+
+{% block content %}
+<div style="max-width: 960px; margin: 0 auto;">
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">
+                <i class="fas fa-flask"></i> Soil & Field Telemetry Input Form
+            </div>
+            <span class="tag tag-positive">
+                <i class="fas fa-robot"></i> Multi-Variable AI Inference
+            </span>
+        </div>
+
+        <!-- Live Climate Sync Helper Box -->
+        <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: var(--radius-md); padding: 14px 18px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div class="pulse-dot" style="background: #0284c7;"></div>
+                <div style="font-size: 0.88rem; color: #0369a1; font-weight: 600;">
+                    Sync with Real-Time Local Weather & Climate Station:
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <select id="sync-city-select" class="form-control" style="width: 170px; padding: 6px 10px; font-size: 0.84rem;">
+                    {% for c in cities %}
+                        <option value="{{ c }}">{{ c }}</option>
+                    {% endfor %}
+                </select>
+                <button type="button" id="btn-sync-weather-form" class="btn btn-secondary btn-sm" style="background: #fff; color: #0284c7; font-weight: 700; border-color: #bae6fd;">
+                    <i class="fas fa-cloud-bolt"></i> Auto-Fill from Live Telemetry
+                </button>
+            </div>
+        </div>
+
+        <form method="POST" action="{{ url_for('fertilizer.recommend') }}">
+            <!-- Section 1: Crop & Soil Selection -->
+            <div style="margin-bottom: 24px;">
+                <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--primary-dark); margin-bottom: 12px; border-bottom: 1px solid var(--border-light); padding-bottom: 6px;">
+                    1. Crop & Soil Classification
+                </h4>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="crop_type">
+                            <i class="fas fa-wheat-awn" style="color: #f59e0b;"></i> Target Crop
+                        </label>
+                        <select id="crop_type" name="crop_type" class="form-control" required>
+                            {% for crop in crops %}
+                                <option value="{{ crop }}">{{ crop }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="soil_type">
+                            <i class="fas fa-layer-group" style="color: #8b5cf6;"></i> Soil Texture / Type
+                        </label>
+                        <select id="soil_type" name="soil_type" class="form-control" required>
+                            {% for soil in soils %}
+                                <option value="{{ soil }}">{{ soil }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2: Macro Nutrients (NPK) & Soil pH -->
+            <div style="margin-bottom: 24px;">
+                <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--primary-dark); margin-bottom: 12px; border-bottom: 1px solid var(--border-light); padding-bottom: 6px;">
+                    2. Soil Macro-Nutrient Levels (from Soil Test Report / IoT Node)
+                </h4>
+                <div class="form-row" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+                    <div class="form-group">
+                        <label class="form-label" for="nitrogen">
+                            Nitrogen (N) <small style="color: var(--text-muted);">(kg/ha)</small>
+                        </label>
+                        <input type="number" step="0.1" min="0" max="300" id="nitrogen" name="nitrogen" class="form-control" value="45.0" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="phosphorus">
+                            Phosphorus (P) <small style="color: var(--text-muted);">(kg/ha)</small>
+                        </label>
+                        <input type="number" step="0.1" min="0" max="200" id="phosphorus" name="phosphorus" class="form-control" value="25.0" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="potassium">
+                            Potassium (K) <small style="color: var(--text-muted);">(kg/ha)</small>
+                        </label>
+                        <input type="number" step="0.1" min="0" max="300" id="potassium" name="potassium" class="form-control" value="35.0" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="ph">
+                            Soil pH Value <small style="color: var(--text-muted);">(0-14)</small>
+                        </label>
+                        <input type="number" step="0.1" min="3.0" max="11.0" id="ph" name="ph" class="form-control" value="6.5" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 3: Weather & Environmental Indicators -->
+            <div style="margin-bottom: 30px;">
+                <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--primary-dark); margin-bottom: 12px; border-bottom: 1px solid var(--border-light); padding-bottom: 6px;">
+                    3. Regional Climate & Environmental Conditions (Auto-synced)
+                </h4>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="temperature">
+                            <i class="fas fa-temperature-half" style="color: #ef4444;"></i> Avg Temperature (°C)
+                        </label>
+                        <input type="number" step="0.1" min="-10" max="55" id="temperature" name="temperature" class="form-control" value="28.5" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="humidity">
+                            <i class="fas fa-droplet" style="color: #0284c7;"></i> Relative Humidity (%)
+                        </label>
+                        <input type="number" step="0.1" min="0" max="100" id="humidity" name="humidity" class="form-control" value="75.0" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="rainfall">
+                            <i class="fas fa-cloud-rain" style="color: #3b82f6;"></i> Seasonal Rainfall (mm)
+                        </label>
+                        <input type="number" step="1" min="0" max="2000" id="rainfall" name="rainfall" class="form-control" value="180" required>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 14px;">
+                <button type="reset" class="btn btn-secondary">
+                    <i class="fas fa-rotate-left"></i> Reset Form
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-brain"></i> Compute AI Recommendation
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

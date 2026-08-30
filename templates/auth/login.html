@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Fritz-Haber Agritech</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            padding: 24px;
+        }
+        .auth-card {
+            background: #ffffff;
+            border-radius: var(--radius-xl);
+            width: 100%;
+            max-width: 460px;
+            box-shadow: var(--shadow-xl);
+            overflow: hidden;
+            padding: 36px 32px;
+        }
+        .auth-header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+        .auth-logo {
+            width: 54px;
+            height: 54px;
+            background: var(--primary-gradient);
+            border-radius: var(--radius-md);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            color: #fff;
+            margin-bottom: 12px;
+            box-shadow: 0 8px 16px rgba(16, 185, 129, 0.35);
+        }
+        .demo-credentials {
+            background: #f8fafc;
+            border: 1px dashed #cbd5e1;
+            border-radius: var(--radius-md);
+            padding: 14px;
+            margin-top: 24px;
+            font-size: 0.82rem;
+        }
+        .demo-tag {
+            font-weight: 700;
+            color: var(--primary-dark);
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="auth-logo">
+                    <i class="fas fa-seedling"></i>
+                </div>
+                <h2 style="font-size: 1.5rem; font-weight: 800; color: #0f172a;">Welcome Back</h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">Sign in to your Smart Farming Dashboard</p>
+            </div>
+
+            <!-- Flash alerts -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}" style="font-size: 0.85rem; padding: 10px 14px;">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" action="{{ url_for('auth.login') }}">
+                <div class="form-group">
+                    <label class="form-label" for="email">Email Address</label>
+                    <div style="position: relative;">
+                        <input type="email" id="email" name="email" class="form-control" placeholder="name@domain.com" required value="farmer@agritech.com">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">Password</label>
+                    <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required value="Farmer@123">
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px; padding: 12px;">
+                    <i class="fas fa-arrow-right-to-bracket"></i> Sign In to Platform
+                </button>
+            </form>
+
+            <div class="demo-credentials">
+                <div style="font-weight: 700; color: #334155; margin-bottom: 6px;">
+                    <i class="fas fa-key"></i> Quick Demo Access:
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                    <span>Farmer Account:</span>
+                    <code>farmer@agritech.com / Farmer@123</code>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Admin Account:</span>
+                    <code>admin@agritech.com / Admin@123</code>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 24px; font-size: 0.88rem; color: var(--text-muted);">
+                Don't have an account? 
+                <a href="{{ url_for('auth.register') }}" style="color: var(--primary); font-weight: 700;">Create Account</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block title %}Agri-News & Sentiment Intelligence{% endblock %}
+{% block page_title %}Agricultural News & AI Sentiment Feed{% endblock %}
+{% block page_subtitle %}Real-time market trends, weather advisories & natural language tone detection{% endblock %}
+
+{% block content %}
+<div style="display: flex; flex-direction: column; gap: 24px;">
+
+    <!-- Sentiment Stats & Filter Bar -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+        <a href="{{ url_for('news.index', sentiment='all', category=selected_category) }}" class="card" style="padding: 16px; display: flex; align-items: center; justify-content: space-between; {% if selected_sentiment == 'all' %}border-color: var(--primary); background: #f0fdf4;{% endif %}">
+            <div>
+                <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">ALL ARTICLES</div>
+                <div style="font-size: 1.5rem; font-weight: 800;">{{ stats['total'] }}</div>
+            </div>
+            <i class="fas fa-newspaper" style="font-size: 1.8rem; color: var(--text-light);"></i>
+        </a>
+
+        <a href="{{ url_for('news.index', sentiment='Positive', category=selected_category) }}" class="card" style="padding: 16px; display: flex; align-items: center; justify-content: space-between; {% if selected_sentiment == 'Positive' %}border-color: #10b981; background: #ecfdf5;{% endif %}">
+            <div>
+                <div style="font-size: 0.8rem; color: #059669; font-weight: 600;">POSITIVE OUTLOOK</div>
+                <div style="font-size: 1.5rem; font-weight: 800; color: #059669;">{{ stats['positive'] }}</div>
+            </div>
+            <i class="fas fa-arrow-trend-up" style="font-size: 1.8rem; color: #10b981;"></i>
+        </a>
+
+        <a href="{{ url_for('news.index', sentiment='Neutral', category=selected_category) }}" class="card" style="padding: 16px; display: flex; align-items: center; justify-content: space-between; {% if selected_sentiment == 'Neutral' %}border-color: #64748b; background: #f8fafc;{% endif %}">
+            <div>
+                <div style="font-size: 0.8rem; color: #475569; font-weight: 600;">NEUTRAL / STABLE</div>
+                <div style="font-size: 1.5rem; font-weight: 800; color: #475569;">{{ stats['neutral'] }}</div>
+            </div>
+            <i class="fas fa-minus" style="font-size: 1.8rem; color: #64748b;"></i>
+        </a>
+
+        <a href="{{ url_for('news.index', sentiment='Negative', category=selected_category) }}" class="card" style="padding: 16px; display: flex; align-items: center; justify-content: space-between; {% if selected_sentiment == 'Negative' %}border-color: #ef4444; background: #fef2f2;{% endif %}">
+            <div>
+                <div style="font-size: 0.8rem; color: #dc2626; font-weight: 600;">CAUTION / RISK</div>
+                <div style="font-size: 1.5rem; font-weight: 800; color: #dc2626;">{{ stats['negative'] }}</div>
+            </div>
+            <i class="fas fa-arrow-trend-down" style="font-size: 1.8rem; color: #ef4444;"></i>
+        </a>
+    </div>
+
+    <!-- Live AI Sentiment Analyzer Tool -->
+    <div class="card" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #fff;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+            <div class="card-title" style="color: #fff; font-size: 1.05rem;">
+                <i class="fas fa-wand-magic-sparkles" style="color: var(--primary);"></i> Interactive NLP Sentiment Classifier
+            </div>
+            <span class="tag" style="background: rgba(255,255,255,0.15); color: #fff;">
+                NLTK + Lexicon Polarity Engine
+            </span>
+        </div>
+        <p style="font-size: 0.85rem; opacity: 0.85; margin-bottom: 14px;">
+            Test the AI sentiment pipeline live. Paste any agriculture headline, market report, or crop advisory below to classify its market sentiment tone.
+        </p>
+
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <input type="text" id="live-sentiment-input" class="form-control" style="flex: 1; min-width: 280px; background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); color: #fff;" placeholder="e.g. Favorable monsoon boosts kharif harvest forecasts across central regions...">
+            <button id="btn-analyze-live" class="btn btn-primary">
+                <i class="fas fa-wand-magic-sparkles"></i> Classify Sentiment
+            </button>
+        </div>
+
+        <div id="live-sentiment-result" style="display: none; margin-top: 16px; padding: 14px; background: rgba(255,255,255,0.08); border-radius: var(--radius-md); border: 1px solid rgba(255,255,255,0.15);">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span id="live-badge" class="tag"></span>
+                <span id="live-score" style="font-size: 0.85rem; font-weight: 700;"></span>
+                <span id="live-confidence" style="font-size: 0.85rem; opacity: 0.8;"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Category Filters -->
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <a href="{{ url_for('news.index', category='all', sentiment=selected_sentiment) }}" class="btn btn-sm {% if selected_category == 'all' %}btn-primary{% else %}btn-secondary{% endif %}">
+                All Topics
+            </a>
+            {% for cat in categories %}
+                <a href="{{ url_for('news.index', category=cat, sentiment=selected_sentiment) }}" class="btn btn-sm {% if selected_category == cat %}btn-primary{% else %}btn-secondary{% endif %}">
+                    {{ cat }}
+                </a>
+            {% endfor %}
+        </div>
+
+        <form method="GET" action="{{ url_for('news.index') }}" style="display: flex; gap: 8px;">
+            <input type="hidden" name="category" value="{{ selected_category }}">
+            <input type="hidden" name="sentiment" value="{{ selected_sentiment }}">
+            <input type="text" name="q" value="{{ search_query }}" class="form-control" style="padding: 6px 12px; font-size: 0.88rem; width: 220px;" placeholder="Search news...">
+            <button type="submit" class="btn btn-secondary btn-sm"><i class="fas fa-search"></i></button>
+        </form>
+    </div>
+
+    <!-- Articles Feed Grid -->
+    <div style="display: flex; flex-direction: column; gap: 16px;">
+        {% if articles %}
+            {% for a in articles %}
+                <div class="card" style="border-left: 5px solid {% if a['sentiment'] == 'Positive' %}#10b981{% elif a['sentiment'] == 'Negative' %}#ef4444{% else %}#64748b{% endif %};">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                            <span class="tag {% if a['sentiment'] == 'Positive' %}tag-positive{% elif a['sentiment'] == 'Negative' %}tag-negative{% else %}tag-neutral{% endif %}">
+                                {% if a['sentiment'] == 'Positive' %}<i class="fas fa-arrow-trend-up"></i>
+                                {% elif a['sentiment'] == 'Negative' %}<i class="fas fa-arrow-trend-down"></i>
+                                {% else %}<i class="fas fa-minus"></i>{% endif %}
+                                {{ a['sentiment'] }} Tone ({{ a['sentiment_score']|round(2) }})
+                            </span>
+                            <span class="tag tag-neutral">{{ a['category'] }}</span>
+                        </div>
+                        <span style="font-size: 0.82rem; color: var(--text-light);">{{ a['published_date'] }}</span>
+                    </div>
+
+                    <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px;">
+                        {{ a['title'] }}
+                    </h3>
+
+                    <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 12px;">
+                        {{ a['summary'] }}
+                    </p>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--text-light); border-top: 1px solid var(--border-light); padding-top: 10px;">
+                        <span><i class="fas fa-newspaper"></i> Source: <strong>{{ a['source'] }}</strong></span>
+                        <span style="color: var(--primary); font-weight: 600;">Verified Agri Intelligence</span>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="card" style="text-align: center; padding: 48px 16px; color: var(--text-muted);">
+                <i class="fas fa-newspaper" style="font-size: 3rem; color: var(--border-color); margin-bottom: 12px;"></i>
+                <p>No news articles found matching the current filters.</p>
+                <a href="{{ url_for('news.index') }}" class="btn btn-secondary btn-sm" style="margin-top: 12px;">Reset Filters</a>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Admin Publisher Box (If Admin) -->
+    {% if session.get('user_role') == 'admin' %}
+    <div class="card" style="border: 2px dashed var(--primary);">
+        <div class="card-header">
+            <div class="card-title">
+                <i class="fas fa-pen-to-square"></i> Admin Dispatch: Publish Agricultural News
+            </div>
+            <span class="tag tag-positive">Automatic AI Sentiment Tagging</span>
+        </div>
+
+        <form method="POST" action="{{ url_for('news.add_article') }}">
+            <div class="form-row">
+                <div class="form-group" style="flex: 2;">
+                    <label class="form-label" for="title">Headline / Title</label>
+                    <input type="text" id="title" name="title" class="form-control" placeholder="e.g. Export incentives announced for organic spices and pulses" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="category">Category</label>
+                    <select id="category" name="category" class="form-control">
+                        <option value="Market">Market</option>
+                        <option value="Weather">Weather</option>
+                        <option value="Subsidies">Subsidies</option>
+                        <option value="Technology">Technology</option>
+                        <option value="Advisory">Advisory</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="summary">Article Summary / Content</label>
+                <textarea id="summary" name="summary" class="form-control" rows="3" placeholder="Provide full details or summary..." required></textarea>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="source">Source Publication</label>
+                    <input type="text" id="source" name="source" class="form-control" value="Fritz-Haber Agritech Desk">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="published_date">Publication Date</label>
+                    <input type="text" id="published_date" name="published_date" class="form-control" value="2024-06-15">
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-paper-plane"></i> Publish with AI Sentiment Tag
+            </button>
+        </form>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

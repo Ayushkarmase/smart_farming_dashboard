@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}Fertilizer Recommendation History{% endblock %}
+{% block page_title %}Fertilizer Analysis History Log{% endblock %}
+{% block page_subtitle %}Comprehensive historical audit trail of all AI fertilizer prescriptions and soil parameters{% endblock %}
+
+{% block content %}
+<div style="display: flex; flex-direction: column; gap: 24px;">
+
+    <!-- Filter & Action Bar -->
+    <div class="card" style="padding: 18px 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+            <!-- Filter Form -->
+            <form method="GET" action="{{ url_for('history.fertilizer_history') }}" style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+                <div>
+                    <select name="crop" class="form-control" style="padding: 7px 12px; font-size: 0.88rem;">
+                        <option value="all">All Crops</option>
+                        {% for c in crops %}
+                            <option value="{{ c }}" {% if c == selected_crop %}selected{% endif %}>{{ c }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <input type="text" name="q" value="{{ search_query }}" class="form-control" style="padding: 7px 12px; font-size: 0.88rem; width: 220px;" placeholder="Search fertilizer/soil...">
+                </div>
+
+                <button type="submit" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-filter"></i> Apply Filters
+                </button>
+            </form>
+
+            <!-- Export CSV -->
+            <div>
+                <a href="{{ url_for('history.export_fertilizer_csv') }}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-file-arrow-down"></i> Export History to CSV
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- History Table Card -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">
+                <i class="fas fa-list-check"></i> Historical Prescriptions ({{ records|length }} Records)
+            </div>
+        </div>
+
+        {% if records %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Date & Time</th>
+                            {% if session.get('user_role') == 'admin' %}
+                                <th>User</th>
+                            {% endif %}
+                            <th>Crop</th>
+                            <th>Soil Type</th>
+                            <th>N-P-K (kg/ha)</th>
+                            <th>pH</th>
+                            <th>Recommended Fertilizer</th>
+                            <th>Dosage</th>
+                            <th>Environmental</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in records %}
+                            <tr>
+                                <td><span style="font-size: 0.82rem; color: var(--text-muted);">{{ r['created_at'][:16] }}</span></td>
+                                {% if session.get('user_role') == 'admin' %}
+                                    <td>
+                                        <strong>{{ r['user_name'] }}</strong>
+                                        <div style="font-size: 0.75rem; color: var(--text-light);">{{ r['user_email'] }}</div>
+                                    </td>
+                                {% endif %}
+                                <td><span class="tag tag-positive">{{ r['crop_type'] }}</span></td>
+                                <td>{{ r['soil_type'] }}</td>
+                                <td><code>{{ r['nitrogen'] }} - {{ r['phosphorus'] }} - {{ r['potassium'] }}</code></td>
+                                <td>{{ r['ph'] }}</td>
+                                <td><strong>{{ r['recommended_fertilizer'] }}</strong></td>
+                                <td><span style="font-weight: 700; color: var(--primary-dark);">{{ r['dosage_kg_per_acre'] }} kg/acre</span></td>
+                                <td>
+                                    <small style="color: var(--text-muted);">{{ r['temperature'] }}°C / {{ r['humidity'] }}% / {{ r['rainfall'] }}mm</small>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 48px 16px; color: var(--text-muted);">
+                <i class="fas fa-folder-open" style="font-size: 3rem; color: var(--border-color); margin-bottom: 12px;"></i>
+                <p>No historical records matching the filter criteria.</p>
+                <a href="{{ url_for('fertilizer.recommend') }}" class="btn btn-primary btn-sm" style="margin-top: 12px;">Create New Recommendation</a>
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

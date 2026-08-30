@@ -1,0 +1,325 @@
+{% extends "base.html" %}
+
+{% block title %}Live Dashboard Overview{% endblock %}
+{% block page_title %}Real-Time Agri-Intelligence Dashboard{% endblock %}
+{% block page_subtitle %}Live field telemetry, real-time APMC Mandi prices & AI recommendation engine{% endblock %}
+
+{% block content %}
+<!-- Live Real-Time Telemetry Row: Weather & IoT Sensors -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;">
+    <!-- Live Field Weather Card -->
+    <div class="card" style="background: linear-gradient(135deg, #075985 0%, #0369a1 100%); color: #fff;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+            <div>
+                <div class="pulse-indicator" style="background: rgba(255,255,255,0.2); color: #fff; border-color: rgba(255,255,255,0.3); margin-bottom: 8px;">
+                    <span class="pulse-dot" style="background: #38bdf8;"></span> LIVE WEATHER TELEMETRY
+                </div>
+                <h3 style="font-size: 1.3rem; font-weight: 800;" id="weather-city-name">{{ weather['city'] }}</h3>
+                <div style="font-size: 0.85rem; opacity: 0.9;" id="weather-condition">{{ weather['condition'] }}</div>
+            </div>
+
+            <!-- City selector & GPS -->
+            <div style="display: flex; gap: 8px;">
+                <select id="weather-city-select" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 4px 8px; border-radius: var(--radius-sm); font-size: 0.8rem; outline: none; cursor: pointer;">
+                    {% for c in cities %}
+                        <option value="{{ c }}" {% if c == weather['city'] %}selected{% endif %} style="color: #000;">{{ c }}</option>
+                    {% endfor %}
+                </select>
+                <button id="btn-gps-weather" class="btn btn-sm" style="background: #fff; color: #0284c7; padding: 4px 10px; font-size: 0.78rem;">
+                    <i class="fas fa-location-crosshairs"></i> Locate
+                </button>
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <i id="weather-icon" class="fas {{ weather['icon'] }}" style="font-size: 3.2rem; color: #fde047;"></i>
+                <div>
+                    <div style="font-size: 2.5rem; font-weight: 800; line-height: 1;" id="weather-temp">{{ weather['temperature'] }}°C</div>
+                    <div style="font-size: 0.75rem; opacity: 0.8; margin-top: 4px;">Feels like {{ weather['feels_like'] }}°C</div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: right;">
+                <div style="background: rgba(255,255,255,0.1); padding: 6px 12px; border-radius: var(--radius-sm); font-size: 0.8rem;">
+                    <span style="opacity: 0.8;">Humidity:</span>
+                    <strong style="display: block;" id="weather-humidity">{{ weather['humidity'] }}%</strong>
+                </div>
+                <div style="background: rgba(255,255,255,0.1); padding: 6px 12px; border-radius: var(--radius-sm); font-size: 0.8rem;">
+                    <span style="opacity: 0.8;">Wind:</span>
+                    <strong style="display: block;" id="weather-wind">{{ weather['wind_speed'] }} km/h</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3-Day Mini Outlook -->
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 12px; font-size: 0.75rem; text-align: center;">
+            {% for d in weather['forecast_3day'] %}
+                <div style="background: rgba(255,255,255,0.08); padding: 6px; border-radius: var(--radius-sm);">
+                    <div style="opacity: 0.8;">{{ d['date'] }}</div>
+                    <div style="font-weight: 700; margin-top: 2px;">{{ d['max_temp'] }}° / {{ d['min_temp'] }}°</div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Live IoT Field Soil Sensor Node -->
+    <div class="card" style="background: #ffffff;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <div>
+                <div class="pulse-indicator">
+                    <span class="pulse-dot"></span> IOT SOIL TELEMETRY
+                </div>
+                <span style="font-size: 0.78rem; color: var(--text-light); margin-left: 8px;">Node: <strong>{{ sensors['node_id'] }}</strong></span>
+            </div>
+            <span style="font-size: 0.78rem; color: var(--text-muted);">
+                <i class="fas fa-signal" style="color: var(--primary);"></i> 4G LTE &bull; <span id="iot-timestamp">{{ sensors['timestamp'] }}</span>
+            </span>
+        </div>
+
+        <!-- Moisture Gauge Bar -->
+        <div style="margin-bottom: 14px; background: #f8fafc; padding: 12px; border-radius: var(--radius-md); border: 1px solid var(--border-light);">
+            <div style="display: flex; justify-content: space-between; font-size: 0.84rem; margin-bottom: 6px;">
+                <span><strong>Volumetric Soil Moisture:</strong> <span id="iot-moisture-val" style="color: var(--primary-dark); font-weight: 800;">{{ sensors['sensors']['moisture']['value'] }}%</span></span>
+                <span id="iot-moisture-status" class="tag tag-{{ sensors['sensors']['moisture']['level'] }}">{{ sensors['sensors']['moisture']['status'] }}</span>
+            </div>
+            <div style="width: 100%; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
+                <div id="iot-moisture-bar" style="width: {{ sensors['sensors']['moisture']['value'] }}%; height: 100%; background: var(--primary); transition: width 0.8s ease;"></div>
+            </div>
+        </div>
+
+        <!-- Sensor Grid (Temp, pH, EC, NPK) -->
+        <div class="iot-sensor-grid">
+            <div class="iot-sensor-box">
+                <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Soil Temp</div>
+                <div class="iot-sensor-val" id="iot-temp-val" style="color: #ef4444;">{{ sensors['sensors']['soil_temp']['value'] }}°C</div>
+                <div style="font-size: 0.68rem; color: var(--text-light);">Sub-surface 15cm</div>
+            </div>
+            <div class="iot-sensor-box">
+                <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Soil pH</div>
+                <div class="iot-sensor-val" id="iot-ph-val" style="color: #8b5cf6;">{{ sensors['sensors']['ph']['value'] }}</div>
+                <div style="font-size: 0.68rem; color: var(--text-light);">Bio-available</div>
+            </div>
+            <div class="iot-sensor-box">
+                <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Conductivity</div>
+                <div class="iot-sensor-val" id="iot-ec-val" style="color: #0284c7;">{{ sensors['sensors']['ec']['value'] }} <small style="font-size: 0.7rem;">dS/m</small></div>
+                <div style="font-size: 0.68rem; color: var(--text-light);">Non-Saline</div>
+            </div>
+            <div class="iot-sensor-box">
+                <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Real-time NPK</div>
+                <div style="font-size: 0.85rem; font-weight: 800; color: #047857; margin: 6px 0;">
+                    <span id="iot-n-val">{{ sensors['sensors']['npk']['n'] }}</span> / <span id="iot-p-val">{{ sensors['sensors']['npk']['p'] }}</span> / <span id="iot-k-val">{{ sensors['sensors']['npk']['k'] }}</span>
+                </div>
+                <div style="font-size: 0.68rem; color: var(--text-light);">N-P-K (mg/kg)</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Top Metrics -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon stat-icon-emerald">
+            <i class="fas fa-flask-vial"></i>
+        </div>
+        <div class="stat-content">
+            <h3>{{ total_recs }}</h3>
+            <p>Fertilizer Analyses</p>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon stat-icon-blue">
+            <i class="fas fa-chart-line"></i>
+        </div>
+        <div class="stat-content">
+            <h3>{{ total_forecasts }}</h3>
+            <p>Forecast Projections</p>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon stat-icon-amber">
+            <i class="fas fa-newspaper"></i>
+        </div>
+        <div class="stat-content">
+            <h3>{{ total_news }}</h3>
+            <p>AI News Intelligence</p>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon stat-icon-purple">
+            <i class="fas fa-bullhorn"></i>
+        </div>
+        <div class="stat-content">
+            <h3>{{ notifications|length }}</h3>
+            <p>Active Advisories</p>
+        </div>
+    </div>
+</div>
+
+<!-- Live APMC Commodity Market Board -->
+<div class="card" style="margin-bottom: 28px;">
+    <div class="card-header">
+        <div>
+            <div class="card-title">
+                <i class="fas fa-scale-balanced"></i> Live APMC Mandi Commodity Rates
+            </div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">
+                Real-time price feed from regional agricultural exchanges &bull; Last updated: <span id="mandi-last-update">{{ mandi['timestamp'] }}</span>
+            </div>
+        </div>
+        <div class="pulse-indicator">
+            <span class="pulse-dot"></span> STREAM ACTIVE
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Crop / Commodity</th>
+                    <th>Variety / Grade</th>
+                    <th>Primary Mandi</th>
+                    <th>Live Price</th>
+                    <th>Day Change</th>
+                    <th>Govt MSP</th>
+                    <th>Market Arrivals</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in mandi['commodities'] %}
+                    <tr data-mandi-crop="{{ item['crop'] }}">
+                        <td><strong>{{ item['crop'] }}</strong></td>
+                        <td>{{ item['variety'] }}</td>
+                        <td><i class="fas fa-location-dot" style="color: var(--primary);"></i> {{ item['mandi'] }}</td>
+                        <td><strong class="mandi-price" style="font-size: 1.05rem; color: var(--text-main);">₹{{ "{:,}".format(item['price']) }}</strong> <small style="color: var(--text-light); font-size: 0.75rem;">{{ item['unit'] }}</small></td>
+                        <td>
+                            <span class="mandi-diff tag {% if item['trend'] == 'up' %}tag-positive{% elif item['trend'] == 'down' %}tag-negative{% else %}tag-neutral{% endif %}">
+                                {% if item['trend'] == 'up' %}▲ +{% elif item['trend'] == 'down' %}▼ {% endif %}{{ item['diff'] }} ({{ '+' if item['pct_change'] > 0 else '' }}{{ item['pct_change'] }}%)
+                            </span>
+                        </td>
+                        <td><span style="font-size: 0.85rem; color: var(--text-muted);">₹{{ "{:,}".format(item['msp']) }}</span></td>
+                        <td><span style="font-size: 0.82rem; font-weight: 600;">{{ item['arrivals'] }}</span></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Main Content Columns -->
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+    <!-- Left Column: Recent Recommendations & News -->
+    <div style="display: flex; flex-direction: column; gap: 24px;">
+        <!-- Recent Recommendations Card -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="fas fa-clock-rotate-left"></i> Recent Soil & Fertilizer Recommendations
+                </div>
+                <a href="{{ url_for('history.fertilizer_history') }}" class="btn btn-outline btn-sm">View All</a>
+            </div>
+
+            {% if recent_recs %}
+                <div style="display: flex; flex-direction: column; gap: 14px;">
+                    {% for rec in recent_recs %}
+                        <div style="border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 16px; display: flex; justify-content: space-between; align-items: center; background: #fafafa;">
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                    <span class="tag tag-positive">{{ rec['crop_type'] }}</span>
+                                    <span style="font-size: 0.82rem; color: var(--text-muted);">{{ rec['soil_type'] }} Soil</span>
+                                </div>
+                                <h4 style="font-size: 1rem; font-weight: 700; color: var(--text-main); margin-bottom: 2px;">
+                                    {{ rec['recommended_fertilizer'] }}
+                                </h4>
+                                <div style="font-size: 0.82rem; color: var(--text-muted);">
+                                    Dosage: <strong>{{ rec['dosage_kg_per_acre'] }} kg/acre</strong> &bull; NPK: {{ rec['nitrogen'] }}-{{ rec['phosphorus'] }}-{{ rec['potassium'] }} &bull; pH: {{ rec['ph'] }}
+                                </div>
+                            </div>
+                            <span style="font-size: 0.78rem; color: var(--text-light); text-align: right;">
+                                {{ rec['created_at'][:10] }}
+                            </span>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div style="text-align: center; padding: 32px 16px; color: var(--text-muted);">
+                    <i class="fas fa-flask" style="font-size: 2.5rem; color: var(--border-color); margin-bottom: 10px;"></i>
+                    <p>No fertilizer recommendations generated yet.</p>
+                    <a href="{{ url_for('fertilizer.recommend') }}" class="btn btn-primary btn-sm" style="margin-top: 12px;">Generate First Plan</a>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Agricultural News Highlights -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="fas fa-rss"></i> Latest Agri-News & Sentiment Insights
+                </div>
+                <a href="{{ url_for('news.index') }}" class="btn btn-outline btn-sm">Explore News Feed</a>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 14px;">
+                {% for item in recent_news %}
+                    <div style="border-left: 4px solid {% if item['sentiment'] == 'Positive' %}#10b981{% elif item['sentiment'] == 'Negative' %}#ef4444{% else %}#64748b{% endif %}; padding: 12px 16px; background: #f8fafc; border-radius: 0 var(--radius-md) var(--radius-md) 0;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                            <span class="tag {% if item['sentiment'] == 'Positive' %}tag-positive{% elif item['sentiment'] == 'Negative' %}tag-negative{% else %}tag-neutral{% endif %}">
+                                {{ item['sentiment'] }} Outlook
+                            </span>
+                            <span style="font-size: 0.78rem; color: var(--text-light);">{{ item['published_date'] }}</span>
+                        </div>
+                        <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-main); margin-bottom: 4px;">
+                            {{ item['title'] }}
+                        </h4>
+                        <p style="font-size: 0.84rem; color: var(--text-muted); line-height: 1.4;">
+                            {{ item['summary'][:130] }}...
+                        </p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Advisories & Quick Tools -->
+    <div style="display: flex; flex-direction: column; gap: 24px;">
+        <!-- Live Announcements -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="fas fa-tower-broadcast"></i> Agritech Advisories
+                </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                {% for n in notifications %}
+                    <div style="padding: 12px; border-radius: var(--radius-md); background: {% if n['type'] == 'warning' %}#fffbeb{% elif n['type'] == 'success' %}#f0fdf4{% else %}#f0f9ff{% endif %}; border: 1px solid {% if n['type'] == 'warning' %}#fde68a{% elif n['type'] == 'success' %}#bbf7d0{% else %}#bae6fd{% endif %};">
+                        <div style="font-weight: 700; font-size: 0.88rem; color: #1e293b; margin-bottom: 2px;">
+                            {{ n['title'] }}
+                        </div>
+                        <div style="font-size: 0.8rem; color: #475569;">
+                            {{ n['message'] }}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Quick Knowledge Card -->
+        <div class="card" style="background: #f8fafc; border: 1px dashed var(--border-color);">
+            <div style="text-align: center; padding: 12px 0;">
+                <i class="fas fa-book-bookmark" style="font-size: 2.2rem; color: var(--primary); margin-bottom: 12px;"></i>
+                <h4 style="font-size: 1.05rem; font-weight: 700; margin-bottom: 6px;">Need Soil Science Guidance?</h4>
+                <p style="font-size: 0.84rem; color: var(--text-muted); margin-bottom: 16px;">
+                    Explore our curated guides on NPK fertilization, precision farming, and eco-friendly soil practices.
+                </p>
+                <a href="{{ url_for('info.know_more') }}" class="btn btn-secondary btn-sm" style="width: 100%;">
+                    <i class="fas fa-graduation-cap"></i> Open Knowledge Center
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

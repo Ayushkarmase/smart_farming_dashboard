@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+
+{% block title %}About Us & FAQ{% endblock %}
+{% block page_title %}About Fritz-Haber Agritech LLP{% endblock %}
+{% block page_subtitle %}Pioneering data-driven precision farming, AI soil analysis & sustainable agricultural intelligence{% endblock %}
+
+{% block extra_css %}
+<style>
+    .accordion-item {
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        margin-bottom: 12px;
+        background: #ffffff;
+        overflow: hidden;
+        transition: var(--transition);
+    }
+    .accordion-header {
+        padding: 16px 20px;
+        font-weight: 700;
+        font-size: 0.95rem;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #f8fafc;
+        color: var(--text-main);
+    }
+    .accordion-header:hover {
+        background: #f1f5f9;
+    }
+    .accordion-body {
+        padding: 0 20px;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease, padding 0.3s ease;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        line-height: 1.6;
+    }
+    .accordion-item.active .accordion-body {
+        padding: 16px 20px;
+        max-height: 500px;
+    }
+    .accordion-item.active .accordion-header i {
+        transform: rotate(180deg);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="display: flex; flex-direction: column; gap: 32px; max-width: 1100px; margin: 0 auto;">
+
+    <!-- About Company Overview Card -->
+    <div class="card" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #fff;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 20px;">
+            <div style="max-width: 700px;">
+                <span class="tag" style="background: rgba(16, 185, 129, 0.2); color: #34d399; margin-bottom: 12px; border: 1px solid rgba(16, 185, 129, 0.3);">
+                    <i class="fas fa-leaf"></i> Fritz-Haber Agritech LLP
+                </span>
+                <h2 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 12px; color: #fff;">
+                    Empowering Agriculture Through Artificial Intelligence
+                </h2>
+                <p style="font-size: 0.95rem; opacity: 0.9; line-height: 1.6; margin-bottom: 16px;">
+                    Named in homage to Nobel laureate Fritz Haber, the visionary pioneer of chemical fertilizer synthesis, 
+                    <strong>Fritz-Haber Agritech LLP</strong> bridges traditional agricultural stewardship with next-generation 
+                    machine learning and sensor technologies.
+                </p>
+                <p style="font-size: 0.9rem; opacity: 0.8; line-height: 1.6;">
+                    Our mission is to eliminate excessive fertilizer runoff, optimize farmer crop yields, provide transparent market supply chain forecasting, and promote regenerative, climate-resilient agriculture.
+                </p>
+            </div>
+            <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-lg); padding: 20px; width: 260px;">
+                <div style="font-size: 0.8rem; color: var(--text-light); text-transform: uppercase; font-weight: 700;">Project Details</div>
+                <div style="margin-top: 10px; font-size: 0.85rem; display: flex; flex-direction: column; gap: 8px;">
+                    <div><strong>Developer:</strong> Ayush Karmase</div>
+                    <div><strong>PRN:</strong> 2230421995519</div>
+                    <div><strong>Affiliation:</strong> Government College of Engineering, Ratnagiri</div>
+                    <div><strong>Domain:</strong> AI & Data Science</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Core Pillars Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+        <div class="card">
+            <div style="width: 48px; height: 48px; border-radius: var(--radius-md); background: #d1fae5; color: #059669; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 16px;">
+                <i class="fas fa-microscope"></i>
+            </div>
+            <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 8px;">Precision Nutrient Management</h3>
+            <p style="font-size: 0.88rem; color: var(--text-muted);">
+                Data-backed NPK recommendations customized to specific soil textures and regional climate indicators.
+            </p>
+        </div>
+
+        <div class="card">
+            <div style="width: 48px; height: 48px; border-radius: var(--radius-md); background: #e0f2fe; color: #0284c7; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 16px;">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 8px;">Predictive Sales & Demand</h3>
+            <p style="font-size: 0.88rem; color: var(--text-muted);">
+                Time-series forecasting algorithms that help regional cooperatives and distributors maintain ideal stock levels.
+            </p>
+        </div>
+
+        <div class="card">
+            <div style="width: 48px; height: 48px; border-radius: var(--radius-md); background: #fef3c7; color: #d97706; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 16px;">
+                <i class="fas fa-brain"></i>
+            </div>
+            <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 8px;">NLP Agri-Market Sentiment</h3>
+            <p style="font-size: 0.88rem; color: var(--text-muted);">
+                Automated sentiment analysis of market fluctuations, weather alerts, and government fertilizer policies.
+            </p>
+        </div>
+    </div>
+
+    <!-- Collapsible FAQ Section -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">
+                <i class="fas fa-circle-question"></i> Frequently Asked Questions (FAQ)
+            </div>
+        </div>
+
+        <div class="accordion">
+            <div class="accordion-item active">
+                <div class="accordion-header">
+                    <span>How does the AI Fertilizer Recommendation Engine calculate the dosage?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="accordion-body">
+                    The algorithm assesses existing soil test values (Nitrogen, Phosphorus, Potassium, pH) against scientifically calibrated crop target curves. It then factors in soil percolation/leaching indices and climate parameters (temperature, humidity, rainfall) to compute the exact deficit, selecting the most cost-effective and bio-available fertilizer formulation.
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header">
+                    <span>Why is soil pH critical for fertilizer efficiency?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="accordion-body">
+                    Soil pH dictates the bioavailability of nutrients. In highly acidic soils (pH &lt; 5.5), phosphorus binds with aluminum and iron, becoming unavailable to plants. In alkaline soils (pH &gt; 8.0), micronutrients like Zinc, Iron, and Manganese precipitate out. Our system recommends lime or gypsum corrections to restore optimal uptake.
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header">
+                    <span>How accurate is the Sales and Demand Forecasting module?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="accordion-body">
+                    Our forecasting engine uses Scikit-Learn linear regression supplemented with cyclical crop calendar seasonality factors. On historical agronomic datasets, it achieves an R² score exceeding 85% with Low Root Mean Squared Error (RMSE), assisting dealers and cooperatives in preventing stockouts.
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header">
+                    <span>What is Sentiment Analysis in the context of agriculture?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="accordion-body">
+                    Sentiment analysis uses Natural Language Processing (NLP) to classify market reports, weather warnings, and government subsidy declarations into Positive, Neutral, or Negative indicators. This empowers farmers to make proactive pricing and sowing decisions.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Agronomy Support Form -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">
+                <i class="fas fa-envelope"></i> Contact Agronomy Advisory & Support
+            </div>
+        </div>
+
+        <form method="POST" action="{{ url_for('info.about') }}">
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="name">Your Name</label>
+                    <input type="text" id="name" name="name" class="form-control" placeholder="e.g. Ramesh Patil" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="email">Email Address</label>
+                    <input type="email" id="email" name="email" class="form-control" placeholder="farmer@example.com" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="subject">Subject</label>
+                <input type="text" id="subject" name="subject" class="form-control" placeholder="e.g. Soil testing query for Kharif Paddy" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="message">Message / Field Query</label>
+                <textarea id="message" name="message" class="form-control" rows="3" placeholder="Describe your inquiry..." required></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-paper-plane"></i> Submit Inquiry
+            </button>
+        </form>
+    </div>
+
+</div>
+{% endblock %}
