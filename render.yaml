@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: smart-farming-dashboard
+    env: python
+    buildCommand: "pip install -r requirements.txt && python database/db_init.py"
+    startCommand: "gunicorn app:app"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: SECRET_KEY
+        generateValue: true
