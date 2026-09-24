@@ -13,8 +13,15 @@ from blueprints.admin import admin_bp
 from blueprints.history import history_bp
 from blueprints.info import info_bp
 
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+
 def create_app():
-    app = Flask(__name__)
+    app = Flask(
+        __name__,
+        template_folder=os.path.join(BASE_DIR, 'templates'),
+        static_folder=os.path.join(BASE_DIR, 'static'),
+        static_url_path='/static'
+    )
     app.config.from_object(Config)
 
     # Initialize SQLite database and default seed records
