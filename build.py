@@ -28,7 +28,7 @@ def build():
     # 3. Create public/_redirects file
     redirects_content = (
         "/static/*  /static/:splat  200\n"
-        "/*         /.netlify/functions/app/:splat  200\n"
+        "/*         /.netlify/functions/app  200!\n"
     )
     # newline='' + explicit \n ensures LF-only endings on all platforms
     with open(REDIRECTS_FILE, 'w', encoding='utf-8', newline='') as f:

@@ -1,15 +1,38 @@
 import sqlite3
 import os
+import shutil
+import tempfile
 import json
 from werkzeug.security import generate_password_hash
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-DB_PATH = os.path.join(BASE_DIR, 'database', 'agritech.db')
+PROJECT_DB_PATH = os.path.join(BASE_DIR, 'database', 'agritech.db')
 SCHEMA_PATH = os.path.join(BASE_DIR, 'database', 'schema.sql')
 
+def is_serverless():
+    return bool(
+        os.environ.get('AWS_LAMBDA_FUNCTION_NAME') or 
+        os.environ.get('NETLIFY') or 
+        os.environ.get('VERCEL')
+    )
+
+def get_db_path():
+    if is_serverless():
+        tmp_db = os.path.join(tempfile.gettempdir(), 'agritech.db')
+        if not os.path.exists(tmp_db) and os.path.exists(PROJECT_DB_PATH):
+            try:
+                shutil.copy2(PROJECT_DB_PATH, tmp_db)
+            except Exception as e:
+                print(f"Notice: Could not copy baseline db to {tmp_db}: {e}")
+        return tmp_db
+    return PROJECT_DB_PATH
+
+DB_PATH = get_db_path()
+
 def get_db_connection():
-    os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
-    conn = sqlite3.connect(DB_PATH)
+    db_path = get_db_path()
+    os.makedirs(os.path.dirname(db_path), exist_ok=True)
+    conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     return conn
 
